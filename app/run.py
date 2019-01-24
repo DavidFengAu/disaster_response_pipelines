@@ -7,10 +7,9 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar, Histogram
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
-
 
 app = Flask(__name__)
 
@@ -46,7 +45,9 @@ def index():
     categories = df.drop(['id', 'message', 'original', 'genre'], axis=1)
     category_counts = categories.sum().values
     category_names = list(categories.columns.values)
-    
+
+    df['word_count'] = df['message'].apply(lambda x: len(x.split()))
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -83,6 +84,23 @@ def index():
                 },
                 'xaxis': {
                     'title': "Category"
+                }
+            }
+        },
+        {
+            'data': [
+                Histogram(
+                    x=df[df['word_count'] < 100]['word_count']
+                )
+            ],
+
+            'layout': {
+                'title': 'Histogram of Message Word Count',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Message Word Count"
                 }
             }
         }
