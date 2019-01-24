@@ -7,7 +7,7 @@ import pickle
 
 from sqlalchemy import create_engine
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -34,9 +34,14 @@ def build_model():
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer = tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(RandomForestClassifier(n_estimators=50, min_samples_split=4)))
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
-    return pipeline
+    parameters = {
+        'clf__estimator__n_estimators': [10, 25, 50],
+        'clf__estimator__min_samples_split': [2, 4, 6],
+        'clf__estimator__min_samples_leaf': [1, 3, 5]
+    }
+    return GridSearchCV(pipeline, param_grid=parameters, scoring='f1_micro', cv=3)
     
 
 def evaluate_model(model, X_test, Y_test, category_names):
