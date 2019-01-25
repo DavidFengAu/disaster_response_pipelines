@@ -3,6 +3,9 @@
 ### Summary:
 This project contains real messages that were sent during disaster events. It creates a machine learning pipeline to categorize these events into 36 categories, in help to send messages to an appropriate disaster relief agency.
 
+
+![alt text](./sample.png)
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 

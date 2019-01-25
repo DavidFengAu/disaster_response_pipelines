@@ -4,12 +4,35 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    Load csv, and merge
+
+    Args:
+        messages_filepath: sting - path to messages csv file.
+        categories_filepath: string - path to categories csv file.
+
+    Returns:
+        DateFrame: merge two csvs
+
+    """
+
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     return messages.merge(categories, left_on='id', right_on='id')
            
     
 def clean_data(df):
+    """
+    Clean dataframe
+
+    Args:
+        df: DataFrame - dataframe to be cleaned.
+
+    Returns:
+        DataFrame: cleaned df
+
+    """
+
     categories = df['categories'].str.split(';', expand=True)
     first_row = categories.iloc[0]                       
     category_colnames = (lambda x: x.str[0:-2])(first_row)                       
@@ -30,6 +53,18 @@ def clean_data(df):
          
     
 def save_data(df, database_filename):
+    """
+    Save dataframe to database
+
+    Args:
+        df: DataFrame - dataframe to be saved.
+        database_filename: string - database filename
+
+    Returns:
+        Nil
+
+    """
+
     engine = create_engine('sqlite:///' + database_filename)
     engine.execute('DROP TABLE IF EXISTS Responses;')
     df.to_sql('Responses', engine, index=False)  

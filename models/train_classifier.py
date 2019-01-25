@@ -14,6 +14,19 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import classification_report
 
 def load_data(database_filepath):
+    """
+    Load data from database
+
+    Args:
+        database_filepath: sting - database filename.
+
+    Returns:
+        X: features for training
+        Y: prediction columns
+        category_names: columns names for prediction
+
+    """
+
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('Responses', con=engine.connect())
     df = df[df['related'] != 2]
@@ -24,6 +37,17 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """
+    Tokenize to clean text
+
+    Args:
+        text: sting.
+
+    Returns:
+        tokenizer
+
+    """
+
     tokens = nltk.word_tokenize(text)
     lemmatizer = nltk.WordNetLemmatizer()
     clean_tokens = [lemmatizer.lemmatize(token).lower().strip() for token in tokens]
@@ -31,6 +55,17 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Bild tranning model
+
+    Args:
+        Nil
+
+    Returns:
+        model
+
+    """
+
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer = tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -45,11 +80,37 @@ def build_model():
     
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Evaluate tranning model
+
+    Args:
+        model: trained model
+        X_test: testing features
+        Y_test: testing results
+        category_names: columns names for prediction
+
+    Returns:
+        print report
+
+    """
+
     Y_test_predit = model.predict(X_test)
     print(classification_report(Y_test.values, Y_test_predit, target_names=category_names))
 
     
 def save_model(model, model_filepath):
+    """
+    Save tranning model
+
+    Args:
+        model: trained model
+        model_filepath: string - filename to save model
+
+    Returns:
+        nil
+
+    """
+
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
